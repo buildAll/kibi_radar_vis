@@ -187,7 +187,7 @@ define(function (require) {
         .attr('transform', 'translate(' + 0 + ', ' + 1.1 * config.h + ')');
     };
 
-    const _buildSingleLevelLine = function (levelFactor) {
+    const _buildSingleLevelLine = function (levelFactor, isLast) {
       chartVis.levels
         .data(chartVis.allAxis).enter()
         .append('svg:line').classed('level-lines', true)
@@ -196,7 +196,13 @@ define(function (require) {
         .attr('x2', function (d, i) { return levelFactor * (1 - Math.sin((i + 1) * config.radians / chartVis.totalAxes)); })
         .attr('y2', function (d, i) { return levelFactor * (1 - Math.cos((i + 1) * config.radians / chartVis.totalAxes)); })
         .attr('transform', 'translate(' + (config.w / 2 - levelFactor) + ', ' + (config.h / 2 - levelFactor) + ')')
-        .attr('stroke', 'gray')
+        .attr('stroke', function (d, i) {
+          if (isLast) {
+            return 'red';
+          } else {
+            return 'gray';
+          }
+        })
         .attr('stroke-width', '0.5px');
     };
 
@@ -204,8 +210,9 @@ define(function (require) {
     const _buildLevels = function () {
       for (let level = 0; level < config.levels; level++) {
         const levelFactor = chartVis.radius * ((level + 1) / config.levels);
+        const isLast = level === config.levels - 1;
         // build level-lines
-        _buildSingleLevelLine(levelFactor);
+        _buildSingleLevelLine(levelFactor, isLast);
       }
     };
 
@@ -364,25 +371,25 @@ define(function (require) {
         .attr('id', function (d, i) {return 'polygon_' + i;})
         .attr('stroke-width', '2px')
         .attr('stroke', function (d, i) { return config.colors(i); })
-        .attr('fill', function (d, i) { return config.colors(i); })
-        .attr('fill-opacity', config.polygonAreaOpacity)
+        .attr('fill', function (d, i) { return '#fff'; })
+        .attr('fill-opacity', 0)
         .attr('stroke-opacity', config.polygonStrokeOpacity)
-        .on(over, function (d) {
-          chartVis.svg.selectAll('.polygon-areas') // fade all other polygons out
-          .transition(250)
-            .attr('fill-opacity', 0.1)
-            .attr('stroke-opacity', 0.1);
-          d3.select(this) // focus on active polygon
-          .transition(250)
-            .attr('fill-opacity', 0.7)
-            .attr('stroke-opacity', config.polygonStrokeOpacity);
-        })
-        .on(out, function () {
-          d3.selectAll('.polygon-areas')
-            .transition(250)
-            .attr('fill-opacity', config.polygonAreaOpacity)
-            .attr('stroke-opacity', 1);
-        });
+        /// .on(over, function (d) {
+        ///   chartVis.svg.selectAll('.polygon-areas') // fade all other polygons out
+        ///   .transition(250)
+        ///     .attr('fill-opacity', 0.1)
+        ///     .attr('stroke-opacity', 0.1);
+        ///   d3.select(this) // focus on active polygon
+        ///   .transition(250)
+        ///     .attr('fill-opacity', 0.7)
+        ///     .attr('stroke-opacity', config.polygonStrokeOpacity);
+        /// })
+        /// .on(out, function () {
+        ///   d3.selectAll('.polygon-areas')
+        ///     .transition(250)
+        ///     .attr('fill-opacity', config.polygonAreaOpacity)
+        ///     .attr('stroke-opacity', 1);
+        /// });
     };
 
 
