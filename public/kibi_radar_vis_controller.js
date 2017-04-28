@@ -49,7 +49,8 @@ define(function (require) {
         showAxes: true,
         showLegend: true,
         showVertices: true,
-        showPolygons: true
+        showPolygons:true,
+        vertexSize: 10
       };
 
       // initiate main vis component
@@ -332,15 +333,15 @@ define(function (require) {
 
     // show tooltip of vertices
     const _verticesTooltipShow = function (d) {
-      chartVis.verticesTooltip.style('opacity', 0.9)
-        .html('<strong>Value</strong>: ' + d.value + '<br />')
-        .style('left', (d3.event.pageX) + 'px')
-        .style('top', (d3.event.pageY) + 'px');
+     //  chartVis.verticesTooltip.style('opacity', 0.9)
+     //    .html('<strong>Value</strong>: ' + d.value + '<br />')
+     //    .style('left', (d3.event.pageX) + 'px')
+     //    .style('top', (d3.event.pageY) + 'px');
     };
 
     // hide tooltip of vertices
     const _verticesTooltipHide = function () {
-      chartVis.verticesTooltip.style('opacity', 0);
+      // chartVis.verticesTooltip.style('opacity', 0);
     };
 
     // builds out the polygon vertices of the dataset
@@ -352,9 +353,7 @@ define(function (require) {
           .attr('r', config.polygonPointSize)
           .attr('cx', function (d, i) { return d.coordinates.x; })
           .attr('cy', function (d, i) { return d.coordinates.y; })
-          .attr('fill', function (d, g) { return config.colors(g); })
-          .on(over, _verticesTooltipShow)
-          .on(out, _verticesTooltipHide);
+          .attr('fill', function (d, g) { return config.colors(g); });
       });
     };
 
@@ -392,6 +391,24 @@ define(function (require) {
         /// });
     };
 
+    // builds out the polygon vertices of the dataset
+    const _buildRects = function (data) {
+      const offset = config.vertexSize / 2;
+
+      data.forEach(function (group, g) {
+        if (g === data.length - 1) {
+          chartVis.vertices
+            .data(group.axes).enter()
+            .append('svg:rect')
+            .attr('x', function (d, i) { return d.coordinates.x - offset; })
+            .attr('y', function (d, i) { return d.coordinates.y - offset; })
+            .attr('width', config.vertexSize)
+            .attr('height', config.vertexSize)
+            .attr('fill', config.colors(g));
+        }
+      });
+    };
+
 
     const _buildVis = function (data) {
       _buildVisComponents();
@@ -409,7 +426,8 @@ define(function (require) {
       if (showAxes) _buildAxes();
       if (showAxesLabels) _buildAxesLabels();
       if (showLegend) _buildLegend(data);
-      if (showVertices) _buildVertices(data);
+      // if (showVertices) _buildVertices(data);
+      _buildRects(data);
       if (showPolygons) _buildPolygons(data);
     };
 
