@@ -373,7 +373,7 @@ define(function (require) {
         .attr('stroke', function (d, i) { return config.colors(i); })
         .attr('fill', function (d, i) { return '#fff'; })
         .attr('fill-opacity', 0)
-        .attr('stroke-opacity', config.polygonStrokeOpacity)
+        .attr('stroke-opacity', config.polygonStrokeOpacity);
         /// .on(over, function (d) {
         ///   chartVis.svg.selectAll('.polygon-areas') // fade all other polygons out
         ///   .transition(250)
