@@ -25,12 +25,12 @@ define(function (require) {
       template: require('plugins/kibi_radar_vis/kibi_radar_vis.html'),
       params: {
         defaults: {
-          fontSize: 60,
+          // fontSize: 60,
           shareYAxis: true,
-          addTooltip: true,
+          // addTooltip: true,
           addLegend: true,
           isDonut: false,
-          isFacet: false,
+          // isFacet: false,
           addLevel: true,
           addAxe: true,
           addVertice: true,
@@ -39,7 +39,7 @@ define(function (require) {
           addAxeLabel: true,
           addLevelScale: 1,
           addLabelScale: 0.9,
-          addLevelNumber: 5
+          // addLevelNumber: 5
         },
         editor: require('plugins/kibi_radar_vis/kibi_radar_vis_params.html')
       },

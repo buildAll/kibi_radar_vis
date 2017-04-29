@@ -50,7 +50,7 @@ define(function (require) {
         showLegend: true,
         showVertices: true,
         showPolygons:true,
-        vertexSize: 10
+        vertexSize: 8
       };
 
       // initiate main vis component
@@ -75,7 +75,7 @@ define(function (require) {
       }));
       config.levelScale = $scope.vis.params.addLevelScale;
       config.labelScale = $scope.vis.params.addLabelScale;
-      config.levels = $scope.vis.params.addLevelNumber;
+      config.levels = 6 // $scope.vis.params.addLevelNumber;
       config.w *= config.levelScale;
       config.h *= config.levelScale;
       config.paddingX = config.w * config.levelScale;
