@@ -32,7 +32,7 @@ define(function (require) {
         levelScale: 0.85,
         labelScale: 1.0,
         facetPaddingScale: 1.0,
-        maxValue: 0,
+        maxValue: 3,
         radians: 2 * Math.PI,
         polygonAreaOpacity: 0.3,
         polygonStrokeOpacity: 1,
@@ -254,21 +254,107 @@ define(function (require) {
     };
     // builds out the axes labels
     const _buildAxesLabels = function () {
-      chartVis.axes
-        .data(chartVis.allAxis).enter()
-        .append('svg:text').classed('axis-labels', true)
-        .text(function (d) { return d; })
-        .attr('text-anchor', 'middle')
-        .attr('x', function (d, i) { return config.w / 2 * (1 - 1.3 * Math.sin(i * config.radians / chartVis.totalAxes)); })
-        .attr('y', function (d, i) { return config.h / 2 * (1 - 1.1 * Math.cos(i * config.radians / chartVis.totalAxes)); })
-        .attr('font-family', 'sans-serif')
-        .attr('font-size', 11 * config.labelScale + 'px');
+      var strs = chartVis.allAxis;
+      var strArr = [];
+      var maxL = 0;
+      var fontSize = 14;
+
+      strs.forEach(str => {
+       var subStr = str.split(" ");
+
+       strArr.push(subStr);
+      });
+
+      strArr.forEach(arr => {
+        if (arr.length > maxL) {
+          maxL = arr.length;
+        }
+      });
+
+      for (let k = 0; k < maxL; k++) {
+        chartVis.axes
+          .data(chartVis.allAxis).enter()
+          .append('svg:text').classed('axis-labels', true)
+          .text(function (d, i) { return strArr[i][k] || ''; })
+          .attr('text-anchor', 'middle')
+          .attr('x', function (d, i) { return config.w / 2 * (1 - 1.3 * Math.sin(i * config.radians / chartVis.totalAxes)); })
+          .attr('y', function (d, i) {
+            var y = config.h / 2 * (1 - 1.1 * Math.cos(i * config.radians / chartVis.totalAxes));
+            if (i === 3) {
+              y = y + 3 + fontSize * k;
+            } else if (i === 0) {
+              y = y - (strArr[i].length - 1) * fontSize + k * fontSize + 3;
+            } else if (strArr[i].length > 1) {
+              y = y + fontSize * k;
+            }
+
+            return y;
+          })
+          .attr('font-family', 'sans-serif')
+          .attr('font-size', 11 * config.labelScale + 'px');
+      }
+
+
+      // chartVis.axes
+      //   .data(chartVis.allAxis).enter()
+      //   .append('svg:text').classed('axis-labels', true)
+      //   .text(function (d, i) { return strArr[i][0] || ''; })
+      //   .attr('text-anchor', 'middle')
+      //   .attr('x', function (d, i) { return config.w / 2 * (1 - 1.3 * Math.sin(i * config.radians / chartVis.totalAxes)); })
+      //   .attr('y', function (d, i) {
+      //     var y = config.h / 2 * (1 - 1.1 * Math.cos(i * config.radians / chartVis.totalAxes));
+
+      //     if (i !== 3 && i !==5) {
+      //       y = y - 14;
+      //     }
+
+      //     if (i === 3) {
+      //       y = y + 3;
+      //     }
+
+      //     return y;
+      //   })
+      //   .attr('font-family', 'sans-serif')
+      //   .attr('font-size', 11 * config.labelScale + 'px');
+
+      // chartVis.axes
+      //   .data(chartVis.allAxis).enter()
+      //   .append('svg:text').classed('axis-labels', true)
+      //   .text(function (d, i) { return strArr[i][1] || ''; })
+      //   .attr('text-anchor', 'middle')
+      //   .attr('x', function (d, i) { return config.w / 2 * (1 - 1.3 * Math.sin(i * config.radians / chartVis.totalAxes)); })
+      //   .attr('y', function (d, i) {
+      //       y = config.h / 2 * (1 - 1.1 * Math.cos(i * config.radians / chartVis.totalAxes));
+      //       if (i === 3) {
+      //         y = y + 17;
+      //       }
+      //       return y;
+      //   })
+      //   .attr('font-family', 'sans-serif')
+      //   .attr('font-size', 11 * config.labelScale + 'px');
+
+      // chartVis.axes
+      //   .data(chartVis.allAxis).enter()
+      //   .append('svg:text').classed('axis-labels', true)
+      //   .text(function (d, i) { return strArr[i][2] || ''; })
+      //   .attr('text-anchor', 'middle')
+      //   .attr('x', function (d, i) { return config.w / 2 * (1 - 1.3 * Math.sin(i * config.radians / chartVis.totalAxes)); })
+      //   .attr('y', function (d, i) {
+      //     var y = config.h / 2 * (1 - 1.1 * Math.cos(i * config.radians / chartVis.totalAxes));
+
+      //     if (i === 3) {
+      //       y = y + 31;
+      //     }
+      //     return y;
+      //   })
+      //   .attr('font-family', 'sans-serif')
+      //   .attr('font-size', 11 * config.labelScale + 'px');
     };
 
     // builds out the legend
     const _buildLegend = function (data) {
       //Create legend squares
-      if (config.facet) {
+      if (config.facet && 0) {
         chartVis.legend.selectAll('.legend-tiles')
           .data(data).enter()
           .append('svg:rect').classed('legend-tiles', true)
@@ -298,22 +384,22 @@ define(function (require) {
           .attr('y', function (d, i) { return i * 2 * config.legendBoxSize - config.h / 2; })
           .attr('width', config.legendBoxSize)
           .attr('height', config.legendBoxSize)
-          .on(over, function (d,i) {
-            chartVis.svg.selectAll('.polygon-areas') // fade all other polygons out
-              .transition(250)
-              .attr('fill-opacity', 0.1)
-              .attr('stroke-opacity', 0.1);
-            d3.select('#polygon_' + i) // focus on active polygon
-              .transition(250)
-              .attr('fill-opacity', 0.7)
-              .attr('stroke-opacity', config.polygonStrokeOpacity);
-          })
-          .on(out, function () {
-            d3.selectAll('.polygon-areas')
-              .transition(250)
-              .attr('fill-opacity', config.polygonAreaOpacity)
-              .attr('stroke-opacity', 1);
-          })
+          // .on(over, function (d,i) {
+          //   chartVis.svg.selectAll('.polygon-areas') // fade all other polygons out
+          //     .transition(250)
+          //     .attr('fill-opacity', 0.1)
+          //     .attr('stroke-opacity', 0.1);
+          //   d3.select('#polygon_' + i) // focus on active polygon
+          //     .transition(250)
+          //     .attr('fill-opacity', 0.7)
+          //     .attr('stroke-opacity', config.polygonStrokeOpacity);
+          // })
+          // .on(out, function () {
+          //   d3.selectAll('.polygon-areas')
+          //     .transition(250)
+          //     .attr('fill-opacity', config.polygonAreaOpacity)
+          //     .attr('stroke-opacity', 1);
+          // })
           .attr('fill', function (d, g) { return config.colors(g); });
 
         //Create text next to squares
@@ -422,7 +508,7 @@ define(function (require) {
       const showPolygons = $scope.vis.params.addPolygon;
 
       if (showLevels) _buildLevels();
-      if (showLevelsLabels) _buildLevelsLabels();
+      // if (showLevelsLabels) _buildLevelsLabels();
       if (showAxes) _buildAxes();
       if (showAxesLabels) _buildAxesLabels();
       if (showLegend) _buildLegend(data);
